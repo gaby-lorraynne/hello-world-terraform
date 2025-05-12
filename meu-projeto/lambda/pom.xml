@@ -12,6 +12,9 @@
     <url>http://maven.apache.org</url>
     <modules>
         <module>funcao-um</module>
+        <module>funcao-doiss</module>
+        <module>funcao-tres</module>
+        <module>funcao-quatro</module>
     </modules>
     <repositories>
         <repository>
