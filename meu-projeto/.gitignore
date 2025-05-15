@@ -4,6 +4,7 @@ target/
 !**/src/test/**/target/
 .terraform/
 .terraform.lock.hcl
+.idea
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
