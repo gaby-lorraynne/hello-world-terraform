@@ -8,7 +8,7 @@ Este repositório contém a infraestrutura como código utilizando **Terraform**
 
 - `main`: branch principal e protegida.
 - `dev`: branch de desenvolvimento, também protegida.
-- Novas funcionalidades ou correções devem ser criadas a partir da `dev`.
+- Novas funcionalidades ou correções devem ser criadas a partir da branch `dev`.
 
 ### 📁 Convenção de Nomes de Branches
 
