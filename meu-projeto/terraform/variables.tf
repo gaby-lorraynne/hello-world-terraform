@@ -17,21 +17,21 @@ variable "profile" {
 variable "function_name" {
   type        = string
   description = "Funcao lambda"
-  default = "funcao-um"
+  default = "hello_terraform"
 }
 
 //Chamar a funcao
 variable "handler" {
   type = string
   description = "Handler da funcao"
-  default = "com.example.FuncaoUmHandler::handleRequest"
+  default = "hello_terraform.lambda_handler"
 }
 
 //Tempo de execucao da minha funcao
 variable "runtime" {
   type        = string
   description = "Tempo execucao da funcao Lambda"
-  default = "java21"
+  default = "python3.12"
 }
 
 //Tamanho da memoria
@@ -60,3 +60,11 @@ variable "create_role" {
   description = "Criar uma nova funcao"
   default = true
 }
+
+//Nome da tabela
+variable "TABLE_NAME" {
+  description = "Nome da tabela"
+  type = string
+  default = "ListaMercado"
+}
+
