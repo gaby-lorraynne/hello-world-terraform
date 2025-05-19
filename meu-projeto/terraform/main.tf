@@ -40,7 +40,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 }
 
 
-module "lambda_funcao_um" {
+module "hello_terraform" {
   source = "./modules/lambda"
 
   function_name = var.function_name
@@ -49,5 +49,5 @@ module "lambda_funcao_um" {
   memory_size   = var.memory_size
   timeout       = var.timeout
   role_arn      = var.create_role ? aws_iam_role.lambda_role[0].arn : var.lambda_role_arn
-  lambda_bucket = "bucket-terraform-gabrielly"
 }
+
