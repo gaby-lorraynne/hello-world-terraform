@@ -51,3 +51,28 @@ module "hello_terraform" {
   role_arn      = var.create_role ? aws_iam_role.lambda_role[0].arn : var.lambda_role_arn
 }
 
+// Módulo Cognito para autenticação de usuários
+module "cognito" {
+  source = "./modules/cognito"
+
+  user_pool_name = var.cognito_user_pool_name
+  client_name    = var.cognito_client_name
+  
+  // Configurações opcionais de senha 
+  password_minimum_length    = var.cognito_password_minimum_length
+  password_require_lowercase = var.cognito_password_require_lowercase
+  password_require_numbers   = var.cognito_password_require_numbers
+  password_require_symbols   = var.cognito_password_require_symbols
+  password_require_uppercase = var.cognito_password_require_uppercase
+  
+  // Configuração MFA
+  mfa_configuration = var.cognito_mfa_configuration
+  
+  // Configurações do Client
+  generate_client_secret = var.cognito_generate_client_secret
+  refresh_token_validity = var.cognito_refresh_token_validity
+  access_token_validity  = var.cognito_access_token_validity
+  id_token_validity      = var.cognito_id_token_validity
+  
+ 
+}
