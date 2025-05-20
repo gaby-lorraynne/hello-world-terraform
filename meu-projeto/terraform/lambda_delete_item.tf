@@ -1,4 +1,10 @@
-# Função Lambda
+data "archive_file" "zip_delete_item" {
+  type        = "zip"
+  source_file = "../lambda/lambda_delete_item/delete_item.py"
+  output_path = "${path.module}/zip/lambda_delete_item.zip"
+}
+
+
 resource "aws_lambda_function" "remover_item" {
   function_name = "remover_item"
   runtime       = "python3.12"
@@ -6,8 +12,8 @@ resource "aws_lambda_function" "remover_item" {
   memory_size   = 512
   timeout       = 10
 
-  filename         = "../lambda/lambda_delete_item/lambda_delete_item.zip"
-  source_code_hash = filebase64sha256("../lambda/lambda_delete_item/lambda_delete_item.zip")
+  filename         = data.archive_file.zip_delete_item.output_path
+  source_code_hash = data.archive_file.zip_delete_item.output_base64sha256
 
   role = aws_iam_role.lambda_exec.arn
 
