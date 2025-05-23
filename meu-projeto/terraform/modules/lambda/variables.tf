@@ -4,5 +4,5 @@ variable "runtime" {}
 variable "memory_size" {}
 variable "timeout" {}
 variable "role_arn" {}
-variable http_method {}
-variable value_path {}
+variable "http_method" {}
+variable "value_path" {}

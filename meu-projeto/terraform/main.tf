@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    bucket = "bucket-terraform-valeria"
+    bucket = "bucket-terraform-gaby"
     key    = "dev/terraform.tfstate"
-    region = "us-east-1"
+    region = "sa-east-1"
   }
 
   required_providers {
@@ -28,7 +28,7 @@ resource "aws_iam_role" "lambda_role" {
         Principal = {
           Service = "lambda.amazonaws.com"
         }
-      }]
+    }]
   })
 }
 
