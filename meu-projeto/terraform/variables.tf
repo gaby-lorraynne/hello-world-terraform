@@ -1,6 +1,6 @@
 //Definindo regiao
 variable "region" {
-  type        = string
+  type = string
   //Regiao de SP
   default = "sa-east-1"
 }
@@ -9,7 +9,7 @@ variable "region" {
 variable "profile" {
   type        = string
   description = "AWS CLI perfil"
-  default = "default"
+  default     = "default"
 }
 
 
@@ -17,55 +17,67 @@ variable "profile" {
 variable "function_name" {
   type        = string
   description = "Funcao lambda"
-  default = "hello_terraform"
+  default     = "hello_terraform"
 }
 
 //Chamar a funcao
 variable "handler" {
-  type = string
+  type        = string
   description = "Handler da funcao"
-  default = "hello_terraform.lambda_handler"
+  default     = "hello_terraform.lambda_handler"
 }
 
 //Tempo de execucao da minha funcao
 variable "runtime" {
   type        = string
   description = "Tempo execucao da funcao Lambda"
-  default = "python3.12"
+  default     = "python3.12"
 }
 
 //Tamanho da memoria
 variable "memory_size" {
-  type = number
+  type        = number
   description = "Quantidade de armazenamento"
-  default = 512
+  default     = 512
 }
 
 //Limite de tempo
 variable "timeout" {
-  type = number
+  type        = number
   description = "Tempo de esgotamento"
-  default = 10
+  default     = 10
 }
 
 variable "lambda_role_arn" {
   type        = string
   description = "IAM Role ARN to attach to the Lambda"
-  default = ""
+  default     = ""
 }
 
 //Criar funcao para a lambda
 variable "create_role" {
-  type = bool
+  type        = bool
   description = "Criar uma nova funcao"
-  default = true
+  default     = true
 }
 
 //Nome da tabela
 variable "TABLE_NAME" {
   description = "Nome da tabela"
-  type = string
-  default = "ListaMercado"
+  type        = string
+  default     = "ListaMercado"
+}
+
+variable "http_method" {
+  description = "Método HTTP"
+  type        = string
+  default     = "GET"
+}
+
+variable "value_path" {
+  description = "Caminho do recurso"
+  type        = string
+  default     = "hello"
 }
 
 

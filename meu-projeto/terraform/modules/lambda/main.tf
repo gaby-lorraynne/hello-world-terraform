@@ -5,12 +5,18 @@ data "archive_file" "zip_hello_terraform" {
 }
 
 resource "aws_lambda_function" "hello_terraform" {
-  function_name = var.function_name
-  handler       = var.handler
-  runtime       = var.runtime
-  role          = var.role_arn
+  function_name    = var.function_name
+  handler          = var.handler
+  runtime          = var.runtime
+  role             = var.role_arn
   filename         = data.archive_file.zip_hello_terraform.output_path
   source_code_hash = data.archive_file.zip_hello_terraform.output_base64sha256
-  memory_size   = var.memory_size
-  timeout       = var.timeout
+  memory_size      = var.memory_size
+  timeout          = var.timeout
+  environment {
+    variables = {
+      HTTP_METHOD = var.http_method
+      VALUE_PATH  = var.value_path
+    }
+  }
 }

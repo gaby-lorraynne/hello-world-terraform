@@ -7,7 +7,7 @@ data "archive_file" "zip_add_item" {
 resource "aws_lambda_function" "adicionar_item" {
   function_name = "adicionar_item"
   runtime       = "python3.12"
-  handler = "add_item.lambda_handler"
+  handler       = "add_item.lambda_handler"
   memory_size   = 512
   timeout       = 10
 
