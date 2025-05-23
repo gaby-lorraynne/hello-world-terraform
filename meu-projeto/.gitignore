@@ -6,7 +6,7 @@ target/
 .terraform.lock.hcl
 .idea
 .venv/
-.zip
+*.zip
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
