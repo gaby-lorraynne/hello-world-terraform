@@ -33,3 +33,24 @@ Utilize a seguinte convenção ao nomear suas branches:
    git checkout dev
    git pull origin dev
    git checkout -b feature/nome-da-sua-feature
+
+
+## GitHub Actions: Terraform CI/CD
+
+Este projeto possui uma integração contínua com GitHub Actions utilizando Terraform.
+
+### Como funciona:
+
+- O workflow é acionado automaticamente quando há push na branch `dev` ou quando arquivos `.tf` são alterados via pull request.
+- Também é possível executar manualmente via aba Actions (graças ao `workflow_dispatch`).
+
+### Pré-requisitos:
+
+Para que o workflow funcione corretamente, é necessário configurar os seguintes **segredos** no repositório:
+
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_REGION`
+
+Esses segredos devem ser configurados em **Settings > Secrets and variables > Actions > New repository secret**.
+
