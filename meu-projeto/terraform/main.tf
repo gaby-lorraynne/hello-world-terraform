@@ -76,6 +76,7 @@ module "cognito" {
   id_token_validity      = var.cognito_id_token_validity
 }
 
+// Modulo do API Gateway
 module "apigateway" {
   source            = "./modules/apigateway"
   function_name     = var.function_name
