@@ -23,11 +23,7 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
-
-    - name: Instalar dependências Python (black, isort)
-      run: |
-        python -m pip install --upgrade pip
-        pip install black isort
+        
 
     - name: Configurar AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
