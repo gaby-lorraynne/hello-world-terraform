@@ -1,9 +1,9 @@
 name: Terraform CD
 
 on:
-  push:
   pull_request:
-  workflow_dispatch:
+    branches: 
+      - dev
  
 jobs:
   terraform:
