@@ -7,21 +7,15 @@ resource "aws_api_gateway_rest_api" "rest_api" {
   }
 }
 
-data "aws_cognito_user_pools" "existing_pool" {
-  name = var.user_pool_name
-}
-
-data "aws_cognito_user_pool" "pool" {
-  user_pool_id = tolist(data.aws_cognito_user_pools.existing_pool.ids)[0]
-}
 
 resource "aws_api_gateway_authorizer" "cognito_authorizer" {
   name            = "cognito-authorizer"
   rest_api_id     = aws_api_gateway_rest_api.rest_api.id
   type            = "COGNITO_USER_POOLS"
-  provider_arns   = [data.aws_cognito_user_pool.pool.arn]
+  provider_arns   = [var.aws_cognito_user_pool_arn]
   identity_source = "method.request.header.Authorization"
 }
+
 
 resource "aws_api_gateway_resource" "lambdas_resource" {
   rest_api_id = aws_api_gateway_rest_api.rest_api.id

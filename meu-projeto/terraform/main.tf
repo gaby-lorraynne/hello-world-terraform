@@ -78,10 +78,12 @@ module "cognito" {
 
 // Modulo do API Gateway
 module "apigateway" {
-  source            = "./modules/apigateway"
-  function_name     = var.function_name
-  http_method       = var.http_method
-  user_pool_name    = var.cognito_user_pool_name
-  value_path        = var.value_path
-  lambda_invoke_arn = module.hello_terraform.lambda_invoke_arn
+  source                    = "./modules/apigateway"
+  function_name             = var.function_name
+  http_method               = var.http_method
+  user_pool_name            = var.cognito_user_pool_name
+  aws_cognito_user_pool_arn = module.cognito.user_pool_arn
+  aws_cognito_user_pool_id  = module.cognito.user_pool_id
+  value_path                = var.value_path
+  lambda_invoke_arn         = module.hello_terraform.lambda_invoke_arn
 }
