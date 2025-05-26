@@ -157,3 +157,9 @@ variable "cognito_id_token_validity" {
   type        = number
   default     = 60
 }
+
+variable "environment" {
+  description = "Ambiente de execução"
+  type        = string
+  default     = "dev"
+}

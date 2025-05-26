@@ -20,3 +20,4 @@ resource "aws_lambda_function" "hello_terraform" {
     }
   }
 }
+
