@@ -22,3 +22,10 @@ variable "lambda_invoke_arn" {
   description = "ARN da função Lambda"
   type        = string
 }
+
+
+variable "region" {
+  type = string
+  //Regiao de SP
+  default = "sa-east-1"
+}
