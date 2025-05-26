@@ -42,8 +42,3 @@ variable "aws_cognito_user_pool_arn" {
 variable "aws_cognito_user_pool_id" {
   type = string
 }
-
-variable "lambda_arn" {
-  description = "ARN da função Lambda"
-  type        = string
-}
