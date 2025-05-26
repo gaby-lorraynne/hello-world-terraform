@@ -24,11 +24,9 @@ variable "lambda_invoke_arn" {
 }
 
 variable "lambda_function_arn" {
-  description = "ARN da função Lambda (sem /invocations)"
+  description = "ARN da função Lambda para integração com o API Gateway"
   type        = string
 }
-
-
 
 variable "region" {
   type = string
@@ -43,4 +41,9 @@ variable "aws_cognito_user_pool_arn" {
 
 variable "aws_cognito_user_pool_id" {
   type = string
+}
+
+variable "lambda_arn" {
+  description = "ARN da função Lambda"
+  type        = string
 }

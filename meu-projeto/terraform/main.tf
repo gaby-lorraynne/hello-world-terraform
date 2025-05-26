@@ -87,4 +87,5 @@ module "apigateway" {
   value_path                = var.value_path
   lambda_invoke_arn         = module.hello_terraform.lambda_invoke_arn
   lambda_function_arn       = module.hello_terraform.lambda_function_arn
+  lambda_arn                = module.hello_terraform.lambda_arn
 }
