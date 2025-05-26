@@ -18,5 +18,9 @@ output "api_gateway_url" {
 }
 
 output "lambda_invoke_arn" {
-  value = aws_lambda_function.hello_terraform.invoke_arn
+  value = var.lambda_invoke_arn
+}
+
+output "lambda_function_arn" {
+  value = var.lambda_function_arn
 }
