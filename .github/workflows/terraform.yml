@@ -9,16 +9,13 @@ jobs:
   terraform:
     name: Terraform CD
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
  
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: Debug AWS Credentials
-        run: | 
-         echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID != '' && 'SET' || 'NOT SET' }}"
-         echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY != '' && 'SET' || 'NOT SET' }}"
-
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -35,19 +32,15 @@ jobs:
   
       - name: Terraform Init
         run: terraform init
-        working-directory: ./terraform
 
       
       - name: Terraform Validate
         run: terraform validate
-        working-directory: ./terraform
 
       
       - name: Terraform Plan
         run: terraform plan -no-color -input=false
-        working-directory: ./terraform
 
     
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
-        working-directory: ./terraform
