@@ -23,6 +23,12 @@ variable "lambda_invoke_arn" {
   type        = string
 }
 
+variable "lambda_function_arn" {
+  description = "ARN da função Lambda (sem /invocations)"
+  type        = string
+}
+
+
 
 variable "region" {
   type = string
