@@ -31,7 +31,7 @@ variable "region" {
 }
 
 variable "aws_cognito_user_pool_arn" {
-  type = string
+  type        = string
   description = "ARN do User Pool do Cognito"
 }
 
