@@ -5,14 +5,6 @@ variable "region" {
   default = "sa-east-1"
 }
 
-//Definando o perfil
-variable "profile" {
-  type        = string
-  description = "AWS CLI perfil"
-  default     = "default"
-}
-
-
 //Definindo nome function lambda
 variable "function_name" {
   type        = string
