@@ -86,4 +86,5 @@ module "apigateway" {
   aws_cognito_user_pool_id  = module.cognito.user_pool_id
   value_path                = var.value_path
   lambda_invoke_arn         = module.hello_terraform.lambda_invoke_arn
+  lambda_function_arn       = module.hello_terraform.lambda_function_arn
 }
