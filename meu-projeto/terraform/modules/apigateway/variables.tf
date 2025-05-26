@@ -29,3 +29,12 @@ variable "region" {
   //Regiao de SP
   default = "sa-east-1"
 }
+
+variable "aws_cognito_user_pool_arn" {
+  type = string
+  description = "ARN do User Pool do Cognito"
+}
+
+variable "aws_cognito_user_pool_id" {
+  type = string
+}

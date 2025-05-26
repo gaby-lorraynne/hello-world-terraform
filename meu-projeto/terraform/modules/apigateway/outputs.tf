@@ -1,11 +1,11 @@
 output "user_pool_id" {
   description = "ID do User Pool do Cognito"
-  value       = data.aws_cognito_user_pool.pool.id
+  value       = var.aws_cognito_user_pool_id
 }
 
 output "user_pool_arn" {
   description = "ARN do User Pool do Cognito"
-  value       = data.aws_cognito_user_pool.pool.arn
+  value       = var.aws_cognito_user_pool_arn
 }
 
 output "api_gateway_id" {
