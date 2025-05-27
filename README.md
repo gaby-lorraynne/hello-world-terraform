@@ -54,3 +54,8 @@ Para que o workflow funcione corretamente, é necessário configurar os seguinte
 
 Esses segredos devem ser configurados em **Settings > Secrets and variables > Actions > New repository secret**.
 
+### Comando para testar:
+
+```bash
+ python -m pytest meu-projeto/tests/test_list_tasks.py -v
+```
