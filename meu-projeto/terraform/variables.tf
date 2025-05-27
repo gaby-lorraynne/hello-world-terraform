@@ -156,13 +156,3 @@ variable "environment" {
   default     = "dev"
 }
 
-variable "role_arn" {
-  description = "ARN da role para a Lambda"
-  type        = string
-}
-
-variable "table_name" {
-  description = "Nome da tabela DynamoDB"
-  type        = string
-  default     = "ListaMercado"
-}
