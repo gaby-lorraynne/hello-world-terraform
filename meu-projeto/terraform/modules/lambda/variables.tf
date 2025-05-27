@@ -6,3 +6,9 @@ variable "timeout" {}
 variable "role_arn" {}
 variable "http_method" {}
 variable "value_path" {}
+
+variable "table_name" {
+  description = "Nome da tabela DynamoDB"
+  type        = string
+  default     = "ListaMercado"
+}
