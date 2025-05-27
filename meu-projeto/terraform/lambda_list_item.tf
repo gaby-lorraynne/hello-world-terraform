@@ -1,8 +1,3 @@
-# ======================================
-# LAMBDA FUNCTION - LIST ITEM
-# Arquivo: modules/lambda/lambda_list_item.tf
-# ======================================
-
 # ZIP da lambda de listagem
 data "archive_file" "zip_list_item" {
   type        = "zip"

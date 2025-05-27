@@ -54,8 +54,30 @@ Para que o workflow funcione corretamente, é necessário configurar os seguinte
 
 Esses segredos devem ser configurados em **Settings > Secrets and variables > Actions > New repository secret**.
 
-### Comando para testar:
+### 🧪 Como rodar os testes e utilitários
 
 ```bash
- python -m pytest meu-projeto/tests/test_list_tasks.py -v
+# Executar todos os testes unitários (pytest)
+python -m pytest meu-projeto/tests/ -v
+
+# Executar um teste específico
+python -m pytest meu-projeto/tests/test_list_tasks.py -v
+
+# Rodar o script de debug local das Lambdas
+python debug_local.py
+
+# Padronizar formatação do código Python
+black .
+
+# Organizar imports automaticamente
+isort .
+
+# Padronizar formatação dos arquivos Terraform
+terraform fmt
 ```
+
+**Dicas:**
+- Certifique-se de estar na raiz do projeto para rodar os comandos acima.
+- O script `debug_local.py` permite testar suas funções Lambda localmente simulando eventos AWS.
+- Use `black` e `isort` para manter o código limpo e padronizado.
+- O comando terraform fmt garante que todos os arquivos .tf estejam com a formatação recomendada pelo Terraform, facilitando a leitura e evitando conflitos de formatação em equipe.
