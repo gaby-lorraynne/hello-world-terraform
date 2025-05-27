@@ -1,3 +1,4 @@
+# ZIP da função hello_terraform
 data "archive_file" "zip_hello_terraform" {
   type        = "zip"
   source_file = "../lambda/lambda_hello_terraform/hello_terraform.py"
@@ -19,13 +20,6 @@ resource "aws_lambda_function" "hello_terraform" {
       VALUE_PATH  = var.value_path
     }
   }
-}
-
-# ZIP da lambda de listagem
-data "archive_file" "zip_list_item" {
-  type        = "zip"
-  source_file = "../lambda/lambda_list_item/list_item.py"
-  output_path = "${path.module}/zip/lambda_list_item.zip"
 }
 
 # ZIP da lambda de listagem

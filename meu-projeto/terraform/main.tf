@@ -56,6 +56,7 @@ module "hello_terraform" {
   role_arn      = var.create_role ? aws_iam_role.lambda_role[0].arn : var.lambda_role_arn
   http_method   = var.http_method
   value_path    = var.value_path
+  table_name    = var.TABLE_NAME 
 }
 
 // Módulo Cognito para autenticação de usuários
