@@ -88,3 +88,31 @@ module "apigateway" {
   lambda_invoke_arn         = module.hello_terraform.lambda_invoke_arn
   lambda_function_arn       = module.hello_terraform.lambda_function_arn
 }
+
+// Segundo módulo Lambda para List Item
+module "lambda_list_item" {
+  source = "./modules/lambda"
+
+  function_name = "listar_item"
+  handler       = "list_item.lambda_handler"
+  runtime       = var.runtime
+  memory_size   = var.memory_size
+  timeout       = var.timeout
+  role_arn      = var.create_role ? aws_iam_role.lambda_role[0].arn : var.lambda_role_arn
+  http_method   = "GET"
+  value_path    = "lista-tarefa"
+  table_name    = var.TABLE_NAME
+}
+
+// Segundo módulo API Gateway para List Item
+module "apigateway_list" {
+  source                    = "./modules/apigateway"
+  function_name             = "listar_item"
+  http_method               = "GET"
+  user_pool_name            = var.cognito_user_pool_name
+  aws_cognito_user_pool_arn = module.cognito.user_pool_arn
+  aws_cognito_user_pool_id  = module.cognito.user_pool_id
+  value_path                = "lista-tarefa"
+  lambda_invoke_arn         = module.lambda_list_item.list_item_invoke_arn
+  lambda_function_arn       = module.lambda_list_item.list_item_function_arn
+}
