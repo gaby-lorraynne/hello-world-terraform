@@ -496,3 +496,4 @@ if __name__ == '__main__':
     print("\n💡 Para executar testes específicos:")
     print("   python -m pytest test_list_tasks.py::TestListarTarefas::test_listar_tarefas_com_data_sucesso -v")
     print("   python -m pytest test_list_tasks.py::TestLambdaHandler -v")
+    
