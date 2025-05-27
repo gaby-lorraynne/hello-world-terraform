@@ -20,7 +20,7 @@ resource "aws_lambda_function" "listar_item" {
 
   environment {
     variables = {
-      TABLE_NAME = var.table_name
+      TABLE_NAME = var.TABLE_NAME
     }
   }
 
