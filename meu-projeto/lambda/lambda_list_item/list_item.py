@@ -30,12 +30,13 @@ def listar_tarefas(data=None, user_id=None):
             response = table.query(
                 KeyConditionExpression=Key("PK").eq(pk) & Key("SK").begins_with("ITEM#"),
                   # Adicionando a FilterExpression para garantir que a data está sendo corretamente aplicada
-                FilterExpression=Key("date").eq(data),  # Filtra as tarefas pela data
+                    FilterExpression=Key("date").eq(data),  # Filtra as tarefas pela data
             )
         else:
             # Buscar todas as tarefas do usuário
-            response = table.scan(FilterExpression=Key("PK").begins_with("LIST#"))
-
+            response = table.scan(
+                FilterExpression=Key("PK").begins_with("LIST#")
+            )
         items = response.get("Items", [])
 
         # Converter para formato amigável
