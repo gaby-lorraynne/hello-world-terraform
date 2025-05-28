@@ -10,15 +10,17 @@ output "lambda_invoke_arn" {
   value = aws_lambda_function.hello_terraform.invoke_arn
 }
 
-# Outputs da função listar_item (condicional)
 output "list_item_function_name" {
-  value = var.function_name == "listar_item" ? aws_lambda_function.listar_item[0].function_name : null
+  description = "Nome da função Lambda de listar itens"
+  value       = aws_lambda_function.listar_item.function_name
 }
 
 output "list_item_function_arn" {
-  value = var.function_name == "listar_item" ? aws_lambda_function.listar_item[0].arn : null
+  description = "ARN da função Lambda de listar itens"
+  value       = aws_lambda_function.listar_item.arn
 }
 
 output "list_item_invoke_arn" {
-  value = var.function_name == "listar_item" ? aws_lambda_function.listar_item[0].invoke_arn : null
+  description = "Invoke ARN da Lambda de listar itens"
+  value       = aws_lambda_function.listar_item.invoke_arn
 }

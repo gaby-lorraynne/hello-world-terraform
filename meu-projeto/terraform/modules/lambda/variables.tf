@@ -12,3 +12,8 @@ variable "table_name" {
   type        = string
   default     = "ListaMercado"
 }
+
+variable "role_arn" {
+  description = "ARN do role da Lambda"
+  type        = string
+}
