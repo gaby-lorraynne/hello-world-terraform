@@ -7,7 +7,7 @@ data "archive_file" "zip_list_item" {
 
 # Função Lambda para listar itens
 resource "aws_lambda_function" "listar_item" {
-  function_name = "listar_item"
+  function_name = "listar_item_v1"
   runtime       = "python3.12"
   handler       = "list_item.lambda_handler"
   memory_size   = 512
