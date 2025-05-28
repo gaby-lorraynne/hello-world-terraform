@@ -1,4 +1,4 @@
-# ZIP da lambda de listagem
+# ZIP da função de listagem de itens
 data "archive_file" "zip_list_item" {
   type        = "zip"
   source_file = "../lambda/lambda_list_item/list_item.py"  # Caminho do arquivo Python
@@ -16,7 +16,7 @@ resource "aws_lambda_function" "listar_item" {
   filename         = data.archive_file.zip_list_item.output_path
   source_code_hash = data.archive_file.zip_list_item.output_base64sha256
 
-  role = var.lambda_role_arn
+  role = aws_iam_role.lambda_exec_listar_item.arn  # Usando a role única para listar_item
 
   environment {
     variables = {
@@ -31,7 +31,7 @@ resource "aws_lambda_function" "listar_item" {
 }
 
 # Criando a role IAM para a Lambda `listar_item`
-resource "aws_iam_role" "lambda_exec" {
+resource "aws_iam_role" "lambda_exec_listar_item" {
   name = "lambda-dynamodb-role-listar-item"
 
   assume_role_policy = jsonencode({
@@ -47,7 +47,7 @@ resource "aws_iam_role" "lambda_exec" {
 }
 
 # Anexando a política de DynamoDB à role
-resource "aws_iam_role_policy_attachment" "lambda_dynamodb" {
-  role       = aws_iam_role.lambda_exec.name
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_listar_item" {
+  role       = aws_iam_role.lambda_exec_listar_item.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
