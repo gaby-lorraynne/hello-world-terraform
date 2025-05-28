@@ -26,9 +26,11 @@ def listar_tarefas(data=None, user_id=None):
             # Buscar tarefas de data específica
             pk = f"LIST#{data.replace('-', '')}"
 
+            # A query filtra pela chave primária (PK) e pela chave secundária (SK)
             response = table.query(
-                KeyConditionExpression=Key("PK").eq(pk),
-                FilterExpression=Key("SK").begins_with("ITEM#"),
+                KeyConditionExpression=Key("PK").eq(pk) & Key("SK").begins_with("ITEM#"),
+                  # Adicionando a FilterExpression para garantir que a data está sendo corretamente aplicada
+                FilterExpression=Key("date").eq(data),  # Filtra as tarefas pela data
             )
         else:
             # Buscar todas as tarefas do usuário
