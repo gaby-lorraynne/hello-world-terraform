@@ -120,6 +120,6 @@ module "apigateway_list" {
   aws_cognito_user_pool_arn = module.cognito.user_pool_arn
   aws_cognito_user_pool_id  = module.cognito.user_pool_id
   value_path                = "lista-tarefa"
-  lambda_invoke_arn         = module.lambda_list_item.list_item_invoke_arn
-  lambda_function_arn       = module.lambda_list_item.list_item_function_arn
+  lambda_invoke_arn         = module.lambda_list_item.invoke_arn
+  lambda_function_arn       = module.lambda_list_item.function_arn
 }
