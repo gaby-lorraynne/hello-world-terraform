@@ -13,7 +13,3 @@ variable "table_name" {
   default     = "ListaMercado"
 }
 
-variable "role_arn" {
-  description = "ARN do role da Lambda"
-  type        = string
-}
