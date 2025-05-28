@@ -105,7 +105,7 @@ module "lambda_list_item" {
   runtime       = var.runtime
   memory_size   = var.memory_size
   timeout       = var.timeout
-  role_arn      = var.create_role ? aws_iam_role.lambda_role[0].arn : var.lambda_role_arn
+  role_arn      = aws_iam_role.lambda_exec.arn  # Usando a role criada no próprio módulo
   http_method   = "GET"
   value_path    = "lista-tarefa"
   table_name    = var.TABLE_NAME

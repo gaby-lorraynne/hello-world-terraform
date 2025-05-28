@@ -29,3 +29,25 @@ resource "aws_lambda_function" "listar_item" {
     Environment = "dev"
   }
 }
+
+# Criando a role IAM para a Lambda `listar_item`
+resource "aws_iam_role" "lambda_exec" {
+  name = "lambda-dynamodb-role-listar-item"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+}
+
+# Anexando a política de DynamoDB à role
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+}
