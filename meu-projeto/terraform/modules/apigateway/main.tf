@@ -46,8 +46,6 @@ resource "aws_lambda_permission" "allow_api_gateway" {
   function_name = var.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.rest_api.execution_arn}/*/${var.http_method}${aws_api_gateway_resource.lambdas_resource.path}"
-
-   depends_on = [aws_lambda_function.hello_terraform]  # Garante que a função Lambda seja criada antes
 }
 
 resource "aws_api_gateway_deployment" "deployment" {
