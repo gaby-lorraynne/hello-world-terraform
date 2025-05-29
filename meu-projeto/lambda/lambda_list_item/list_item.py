@@ -13,7 +13,7 @@ def listar_tarefas(data=None, user_id=None):
     Lista todas as tarefas ou tarefas de uma data específica
 
     Args:
-        data (str, optional): Data no formato 'YYYY-MM-DD'
+        data (str, optional): Data no formato 'YYYY-MM-DD' ou 'YYYYMMDD'
         user_id (str, optional): ID do usuário (do Cognito)
 
     Returns:
@@ -23,21 +23,32 @@ def listar_tarefas(data=None, user_id=None):
         table = dynamodb.Table(TABLE_NAME)
 
         if data:
+            # Converter data para formato da PK se necessário
+            if '-' in data:
+                # Converter de 'YYYY-MM-DD' para 'YYYYMMDD'
+                data_formatada = data.replace('-', '')
+            else:
+                # Já está no formato correto 'YYYYMMDD'
+                data_formatada = data
+            
             # Buscar tarefas de data específica
-            pk = f"LIST#{data}"
+            pk = f"LIST#{data_formatada}"
+            
+            print(f"🔍 Buscando por PK: {pk}")  # Debug log
 
             # Query apenas pela PK específica da data
             response = table.query(
-                KeyConditionExpression=Key("PK").eq(pk) 
+                KeyConditionExpression=Key("PK").eq(pk)
             )
         else:
-            
+            # Buscar todas as tarefas
             response = table.scan(
                 FilterExpression=Attr("PK").begins_with("LIST#")
                 & Attr("SK").begins_with("ITEM#")
             )
             
         items = response.get("Items", [])
+        print(f"📦 Items encontrados no DynamoDB: {len(items)}")  # Debug log
 
         # Converter para formato amigável
         tarefas = []
@@ -58,7 +69,10 @@ def listar_tarefas(data=None, user_id=None):
 
         # Filtro adicional por data se necessário (double check)
         if data:
-            tarefas = [tarefa for tarefa in tarefas if tarefa["date"] == data]
+            # Normalizar data original para comparação
+            data_original = data if '-' in data else f"{data[:4]}-{data[4:6]}-{data[6:8]}"
+            tarefas = [tarefa for tarefa in tarefas if tarefa["date"] == data_original]
+            print(f"🎯 Tarefas após filtro de data '{data_original}': {len(tarefas)}")  # Debug log
           
         return {
             "message": "Tarefas listadas com sucesso!",
@@ -67,7 +81,7 @@ def listar_tarefas(data=None, user_id=None):
         }
 
     except Exception as e:
-      
+        print(f"❌ Erro em listar_tarefas: {str(e)}")  # Debug log
         raise Exception(f"Erro ao listar tarefas: {str(e)}")
 
 
@@ -87,7 +101,7 @@ def lambda_handler(event, context):
         data = None
         user_id = None
 
-        # Query parameters (?data=2024-12-26)
+        # Query parameters (?data=2024-12-26 ou ?data=20241226)
         if event.get("queryStringParameters"):
             data = event["queryStringParameters"].get("data")
             user_id = event["queryStringParameters"].get("user_id")
@@ -134,3 +148,4 @@ def lambda_handler(event, context):
                 ensure_ascii=False,
             ),
         }
+    
