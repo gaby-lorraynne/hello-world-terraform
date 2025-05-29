@@ -81,7 +81,6 @@ class TestListarTarefas(unittest.TestCase):
         mock_table.query.assert_called_once()
         call_args = mock_table.query.call_args[1]
         self.assertIn("KeyConditionExpression", call_args)
-        self.assertIn("FilterExpression", call_args)
 
     @patch("list_item.dynamodb")
     def test_listar_tarefas_sem_data_sucesso(self, mock_dynamodb):
@@ -136,6 +135,28 @@ class TestListarTarefas(unittest.TestCase):
         self.assertEqual(resultado["count"], 3)
         # Função aceita user_id mas não filtra por ele ainda (implementação futura)
 
+    @patch("list_item.dynamodb")
+    def test_listar_tarefas_filtra_data_corretamente(self, mock_dynamodb):
+        """✅ SUCESSO: Filtro por data funciona corretamente"""
+        # Arrange
+        mock_table = MagicMock()
+        mock_dynamodb.Table.return_value = mock_table
+
+        # Simular retorno com itens de datas diferentes (cenário que pode acontecer)
+        items_mixed = [
+            self.sample_items[0],  # 2024-12-26
+            self.sample_items[2],  # 2024-12-27 (deve ser filtrado)
+        ]
+        mock_table.query.return_value = {"Items": items_mixed}
+
+        # Act
+        resultado = listar_tarefas(data="2024-12-26")
+
+        # Assert
+        self.assertEqual(resultado["count"], 1)  # Apenas 1 item da data correta
+        self.assertEqual(resultado["tarefas"][0]["date"], "2024-12-26")
+        self.assertEqual(resultado["tarefas"][0]["name"], "Comprar leite")
+
     # === TESTES DE FALHA ===
 
     @patch("list_item.dynamodb")
@@ -180,6 +201,34 @@ class TestListarTarefas(unittest.TestCase):
 
         self.assertIn("Erro ao listar tarefas", str(context.exception))
 
+    @patch("list_item.dynamodb")
+    def test_listar_tarefas_ignora_items_incompletos(self, mock_dynamodb):
+        """✅ VALIDAÇÃO: Items sem campos obrigatórios são ignorados"""
+        # Arrange
+        mock_table = MagicMock()
+        mock_dynamodb.Table.return_value = mock_table
+
+        # Item incompleto sem campo 'name'
+        item_incompleto = {
+            "PK": "LIST#20241226",
+            "SK": "ITEM#incomplete",
+            "itemId": "incomplete-id",
+            "date": "2024-12-26",
+            "status": "todo",
+            # 'name' está faltando
+        }
+
+        mock_table.query.return_value = {
+            "Items": [self.sample_items[0], item_incompleto]
+        }
+
+        # Act
+        resultado = listar_tarefas(data="2024-12-26")
+
+        # Assert
+        self.assertEqual(resultado["count"], 1)  # Apenas o item completo
+        self.assertEqual(resultado["tarefas"][0]["name"], "Comprar leite")
+
     # === TESTES DE FORMATAÇÃO DE DADOS ===
 
     @patch("list_item.dynamodb")
@@ -221,10 +270,9 @@ class TestListarTarefas(unittest.TestCase):
         # Act
         listar_tarefas(data="2024-12-26")
 
-        # Assert - Verificar se PK foi formatada corretamente
-        call_args = mock_table.query.call_args[1]
-        # O PK deve ser 'LIST#20241226' (sem hífens)
-        # Verificação indireta através da chamada do mock
+        # Assert - Verificar se query foi chamada (PK formatada corretamente)
+        mock_table.query.assert_called_once()
+        # A função deve ter convertido '2024-12-26' para buscar por PK 'LIST#20241226'
 
 
 class TestLambdaHandler(unittest.TestCase):
@@ -474,6 +522,52 @@ class TestIntegracao(unittest.TestCase):
         body = json.loads(response["body"])
         self.assertEqual(body["count"], 1)
         self.assertEqual(body["tarefas"][0]["date"], "2024-12-26")
+
+    @patch("list_item.dynamodb")
+    def test_cenario_filtro_data_especifica_funciona(self, mock_dynamodb):
+        """🔄 INTEGRAÇÃO: Verificar se filtro por data específica funciona corretamente"""
+        # Arrange
+        mock_table = MagicMock()
+        mock_dynamodb.Table.return_value = mock_table
+
+        # Simular que o DynamoDB retorna items de diferentes datas
+        # (isso pode acontecer em cenários de inconsistência)
+        mixed_items = [
+            {
+                "PK": "LIST#20241226",
+                "SK": "ITEM#123",
+                "itemId": "123",
+                "name": "Tarefa correta",
+                "date": "2024-12-26",
+                "status": "todo",
+            },
+            {
+                "PK": "LIST#20241226",
+                "SK": "ITEM#456",
+                "itemId": "456",
+                "name": "Tarefa incorreta",
+                "date": "2024-12-27",  # Data diferente!
+                "status": "done",
+            },
+        ]
+        mock_table.query.return_value = {"Items": mixed_items}
+
+        event = {
+            "queryStringParameters": {"data": "2024-12-26"},
+        }
+        context = {}
+
+        # Act
+        response = lambda_handler(event, context)
+
+        # Assert
+        self.assertEqual(response["statusCode"], 200)
+        body = json.loads(response["body"])
+
+        # Deve retornar apenas 1 tarefa (a que tem data correta)
+        self.assertEqual(body["count"], 1)
+        self.assertEqual(body["tarefas"][0]["date"], "2024-12-26")
+        self.assertEqual(body["tarefas"][0]["name"], "Tarefa correta")
 
 
 if __name__ == "__main__":

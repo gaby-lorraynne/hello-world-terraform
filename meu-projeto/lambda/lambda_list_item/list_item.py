@@ -2,7 +2,7 @@ import json
 import os
 
 import boto3
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Attr, Key
 
 dynamodb = boto3.resource("dynamodb", region_name="sa-east-1")
 TABLE_NAME = os.environ.get("TABLE_NAME", "ListaMercado")
@@ -26,30 +26,55 @@ def listar_tarefas(data=None, user_id=None):
             # Buscar tarefas de data específica
             pk = f"LIST#{data.replace('-', '')}"
 
-            # A query filtra pela chave primária (PK) e pela chave secundária (SK)
+            print(f"🔍 Buscando itens com PK: {pk}")  # Debug log
+
+            # Query apenas pela PK específica da data
             response = table.query(
-                KeyConditionExpression=Key("PK").eq(pk) & Key("SK").begins_with("ITEM#"),
-                  # Adicionando a FilterExpression para garantir que a data está sendo corretamente aplicada
-                FilterExpression=Key("date").eq(data),  # Filtra as tarefas pela data
+                KeyConditionExpression=Key("PK").eq(pk) & Key("SK").begins_with("ITEM#")
             )
+
+            print(
+                f"📊 Itens encontrados na query: {len(response.get('Items', []))}"
+            )  # Debug log
+
         else:
-            # Buscar todas as tarefas do usuário
-            response = table.scan(FilterExpression=Key("PK").begins_with("LIST#"))
+            # Buscar todas as tarefas (scan completo)
+            print("🔍 Fazendo scan de todos os itens")  # Debug log
+
+            response = table.scan(
+                FilterExpression=Key("PK").begins_with("LIST#")
+                & Key("SK").begins_with("ITEM#")
+            )
+
+            print(
+                f"📊 Itens encontrados no scan: {len(response.get('Items', []))}"
+            )  # Debug log
 
         items = response.get("Items", [])
 
         # Converter para formato amigável
         tarefas = []
         for item in items:
-            tarefa = {
-                "itemId": item.get("itemId"),
-                "name": item.get("name"),
-                "date": item.get("date"),
-                "status": item.get("status"),
-                "PK": item.get("PK"),
-                "SK": item.get("SK"),
-            }
-            tarefas.append(tarefa)
+            # Validar se o item tem os campos necessários
+            if all(field in item for field in ["itemId", "name", "date", "status"]):
+                tarefa = {
+                    "itemId": item.get("itemId"),
+                    "name": item.get("name"),
+                    "date": item.get("date"),
+                    "status": item.get("status"),
+                    "PK": item.get("PK"),
+                    "SK": item.get("SK"),
+                }
+                tarefas.append(tarefa)
+            else:
+                print(f"⚠️ Item ignorado por campos faltantes: {item}")  # Debug log
+
+        # Filtro adicional por data se necessário (double check)
+        if data:
+            tarefas = [tarefa for tarefa in tarefas if tarefa["date"] == data]
+            print(
+                f"✅ Após filtro por data '{data}': {len(tarefas)} itens"
+            )  # Debug log
 
         return {
             "message": "Tarefas listadas com sucesso!",
@@ -58,6 +83,7 @@ def listar_tarefas(data=None, user_id=None):
         }
 
     except Exception as e:
+        print(f"❌ Erro ao listar tarefas: {str(e)}")  # Debug log
         raise Exception(f"Erro ao listar tarefas: {str(e)}")
 
 
@@ -92,8 +118,14 @@ def lambda_handler(event, context):
         if event.get("requestContext", {}).get("authorizer", {}).get("claims"):
             user_id = event["requestContext"]["authorizer"]["claims"].get("sub")
 
+        print(
+            f"🎯 Parâmetros recebidos - Data: {data}, User ID: {user_id}"
+        )  # Debug log
+
         # Executar função principal
         resultado = listar_tarefas(data, user_id)
+
+        print(f"✅ Resultado: {resultado['count']} tarefas encontradas")  # Debug log
 
         # Resposta de sucesso
         return {
@@ -108,6 +140,8 @@ def lambda_handler(event, context):
         }
 
     except Exception as e:
+        print(f"❌ Erro no lambda_handler: {str(e)}")  # Debug log
+
         # Resposta de erro
         return {
             "statusCode": 500,
