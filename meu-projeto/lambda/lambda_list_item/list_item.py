@@ -35,13 +35,17 @@ def listar_tarefas(data=None, user_id=None):
             pk = f"LIST#{data_formatada}"
             
             print(f"🔍 Buscando por PK: {pk}")  # Debug log
+            print(f"📅 Data original: {data}")  # Debug log
 
             # Query apenas pela PK específica da data
             response = table.query(
                 KeyConditionExpression=Key("PK").eq(pk)
             )
+            
+            print(f"📦 Response do DynamoDB: {response}")  # Debug log
         else:
             # Buscar todas as tarefas
+            print("🔍 Buscando todas as tarefas (scan)")  # Debug log
             response = table.scan(
                 FilterExpression=Attr("PK").begins_with("LIST#")
                 & Attr("SK").begins_with("ITEM#")
@@ -49,6 +53,10 @@ def listar_tarefas(data=None, user_id=None):
             
         items = response.get("Items", [])
         print(f"📦 Items encontrados no DynamoDB: {len(items)}")  # Debug log
+        
+        # Log dos items para debug
+        for item in items:
+            print(f"🔸 Item: PK={item.get('PK')}, date={item.get('date')}, name={item.get('name')}")
 
         # Converter para formato amigável
         tarefas = []
@@ -67,11 +75,23 @@ def listar_tarefas(data=None, user_id=None):
             else:
                 print(f"⚠️ Item ignorado por campos faltantes: {item}")  # Debug log
 
-        # Filtro adicional por data se necessário (double check)
+        # Se foi uma busca por data específica, validar se os itens realmente são da data correta
         if data:
-            # Normalizar data original para comparação
-            data_original = data if '-' in data else f"{data[:4]}-{data[4:6]}-{data[6:8]}"
-            tarefas = [tarefa for tarefa in tarefas if tarefa["date"] == data_original]
+            # Normalizar data original para comparação (formato YYYY-MM-DD)
+            if '-' in data:
+                data_original = data
+            else:
+                # Converter YYYYMMDD para YYYY-MM-DD
+                data_original = f"{data[:4]}-{data[4:6]}-{data[6:8]}"
+            
+            print(f"🎯 Filtrando por data: {data_original}")  # Debug log
+            tarefas_filtradas = []
+            for tarefa in tarefas:
+                print(f"🔸 Comparando: tarefa.date='{tarefa['date']}' vs data_original='{data_original}'")
+                if tarefa["date"] == data_original:
+                    tarefas_filtradas.append(tarefa)
+            
+            tarefas = tarefas_filtradas
             print(f"🎯 Tarefas após filtro de data '{data_original}': {len(tarefas)}")  # Debug log
           
         return {
@@ -101,25 +121,32 @@ def lambda_handler(event, context):
         data = None
         user_id = None
 
-        # Query parameters (?data=2024-12-26 ou ?data=20241226)
+        print(f"📥 Event completo: {json.dumps(event, indent=2)}")  # Debug log
+
+        # Query parameters - aceitar tanto 'data' quanto 'date'
         if event.get("queryStringParameters"):
-            data = event["queryStringParameters"].get("data")
-            user_id = event["queryStringParameters"].get("user_id")
+            query_params = event["queryStringParameters"]
+            data = query_params.get("data") or query_params.get("date")  # Aceita ambos
+            user_id = query_params.get("user_id")
+            print(f"📥 Query parameters: {query_params}")  # Debug log
 
         # Body parameters (POST)
         if event.get("body"):
             body = json.loads(event["body"])
-            data = body.get("data", data)
+            data = body.get("data", data) or body.get("date", data)  # Aceita ambos
             user_id = body.get("user_id", user_id)
+            print(f"📥 Body parameters: {body}")  # Debug log
 
         # User ID do Cognito
         if event.get("requestContext", {}).get("authorizer", {}).get("claims"):
             user_id = event["requestContext"]["authorizer"]["claims"].get("sub")
 
+        print(f"📥 Parâmetros finais - data: {data}, user_id: {user_id}")  # Debug log
       
         # Executar função principal
         resultado = listar_tarefas(data, user_id)
 
+        print(f"✅ Resultado: {resultado['count']} tarefas encontradas")  # Debug log
 
         # Resposta de sucesso
         return {
