@@ -24,32 +24,19 @@ def listar_tarefas(data=None, user_id=None):
 
         if data:
             # Buscar tarefas de data específica
-            pk = f"LIST#{data.replace('-', '')}"
-
-            print(f"🔍 Buscando itens com PK: {pk}")  # Debug log
+            pk = f"LIST#{data}"
 
             # Query apenas pela PK específica da data
             response = table.query(
-                KeyConditionExpression=Key("PK").eq(pk) & Key("SK").begins_with("ITEM#")
+                KeyConditionExpression=Key("PK").eq(pk) 
             )
-
-            print(
-                f"📊 Itens encontrados na query: {len(response.get('Items', []))}"
-            )  # Debug log
-
         else:
-            # Buscar todas as tarefas (scan completo)
-            print("🔍 Fazendo scan de todos os itens")  # Debug log
-
+            
             response = table.scan(
-                FilterExpression=Key("PK").begins_with("LIST#")
-                & Key("SK").begins_with("ITEM#")
+                FilterExpression=Attr("PK").begins_with("LIST#")
+                & Attr("SK").begins_with("ITEM#")
             )
-
-            print(
-                f"📊 Itens encontrados no scan: {len(response.get('Items', []))}"
-            )  # Debug log
-
+            
         items = response.get("Items", [])
 
         # Converter para formato amigável
@@ -72,10 +59,7 @@ def listar_tarefas(data=None, user_id=None):
         # Filtro adicional por data se necessário (double check)
         if data:
             tarefas = [tarefa for tarefa in tarefas if tarefa["date"] == data]
-            print(
-                f"✅ Após filtro por data '{data}': {len(tarefas)} itens"
-            )  # Debug log
-
+          
         return {
             "message": "Tarefas listadas com sucesso!",
             "count": len(tarefas),
@@ -83,7 +67,7 @@ def listar_tarefas(data=None, user_id=None):
         }
 
     except Exception as e:
-        print(f"❌ Erro ao listar tarefas: {str(e)}")  # Debug log
+      
         raise Exception(f"Erro ao listar tarefas: {str(e)}")
 
 
@@ -118,14 +102,10 @@ def lambda_handler(event, context):
         if event.get("requestContext", {}).get("authorizer", {}).get("claims"):
             user_id = event["requestContext"]["authorizer"]["claims"].get("sub")
 
-        print(
-            f"🎯 Parâmetros recebidos - Data: {data}, User ID: {user_id}"
-        )  # Debug log
-
+      
         # Executar função principal
         resultado = listar_tarefas(data, user_id)
 
-        print(f"✅ Resultado: {resultado['count']} tarefas encontradas")  # Debug log
 
         # Resposta de sucesso
         return {
