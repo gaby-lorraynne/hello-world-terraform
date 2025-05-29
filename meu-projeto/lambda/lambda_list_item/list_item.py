@@ -2,7 +2,7 @@ import json
 import os
 
 import boto3
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, Attr
 
 dynamodb = boto3.resource("dynamodb", region_name="sa-east-1")
 TABLE_NAME = os.environ.get("TABLE_NAME", "ListaMercado")
@@ -26,17 +26,21 @@ def listar_tarefas(data=None, user_id=None):
             # Buscar tarefas de data específica
             pk = f"LIST#{data.replace('-', '')}"
 
+            print(f"Buscando por PK: {pk}")
+
             # A query filtra pela chave primária (PK) e pela chave secundária (SK)
             response = table.query(
                 KeyConditionExpression=Key("PK").eq(pk) & Key("SK").begins_with("ITEM#"),
-                  # Adicionando a FilterExpression para garantir que a data está sendo corretamente aplicada
-                    FilterExpression=Key("date").eq(data),  # Filtra as tarefas pela data
             )
+
+            print(f"Itens Encontrados: {len(response.get('Items', []))}")
+            
         else:
             # Buscar todas as tarefas do usuário
             response = table.scan(
-                FilterExpression=Key("PK").begins_with("LIST#")
+                 FilterExpression=Attr("PK").begins_with("LIST#") & Attr("SK").begins_with("ITEM#")
             )
+
         items = response.get("Items", [])
 
         # Converter para formato amigável
