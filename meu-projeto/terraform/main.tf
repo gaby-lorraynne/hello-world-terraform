@@ -116,11 +116,11 @@ module "apigateway_list" {
   source                   = "./modules/api_gateway_list"
   api_name                 = "lista-item"
   environment              = "dev"
-  function_name            = "listar_item"
+  function_name            = var.function_name_list
   http_method              = var.http_method
   region                   = var.region
   lambda_invoke_arn_get    = module.lambda_list_item.lambda_invoke_arn
   lambda_function_arn      = module.lambda_list_item.lambda_function_arn
-  lambda_function_name_get = module.lambda_list_item.function_name
+  lambda_function_name_get = module.lambda_list_item.lambda_function_name
   cognito_user_pool_arn    = module.cognito.user_pool_arn
 }

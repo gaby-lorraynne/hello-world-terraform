@@ -156,3 +156,8 @@ variable "environment" {
   default     = "dev"
 }
 
+variable "function_name_list" {
+  type        = string
+  description = "Funcao lambda"
+  default     = "list_item"
+}
