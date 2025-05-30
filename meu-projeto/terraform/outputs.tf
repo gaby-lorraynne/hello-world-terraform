@@ -54,5 +54,5 @@ output "list_item_invoke_arn" {
 // URL completa do endpoint de listagem
 output "lista_tarefa_endpoint" {
   description = "URL do endpoint para listar tarefas"
-  value       = "${module.apigateway_list.api_gateway_url}/lista-tarefa"
+  value       = "${module.apigateway_list.api_invoke_url}/lista-tarefa"
 }
