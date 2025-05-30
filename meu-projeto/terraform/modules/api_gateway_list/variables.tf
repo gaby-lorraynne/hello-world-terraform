@@ -1,5 +1,5 @@
 variable "api_name" {}
-variable "function_name" {}
+variable "function_name_list" {}
 variable "http_method" {}
 variable "region" {}
 variable "environment" {}

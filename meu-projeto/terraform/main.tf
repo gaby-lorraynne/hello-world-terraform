@@ -116,7 +116,7 @@ module "apigateway_list" {
   source                   = "./modules/api_gateway_list"
   api_name                 = "lista-item"
   environment              = "dev"
-  function_name            = var.function_name_list
+  function_name_list       = module.lambda_list_item.lambda_function_name
   http_method              = var.http_method
   region                   = var.region
   lambda_invoke_arn_get    = module.lambda_list_item.lambda_invoke_arn

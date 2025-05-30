@@ -159,5 +159,5 @@ variable "environment" {
 variable "function_name_list" {
   type        = string
   description = "Funcao lambda"
-  default     = "list_item"
+  default     = "listar_item_v1"
 }

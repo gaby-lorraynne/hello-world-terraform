@@ -40,7 +40,7 @@ resource "aws_api_gateway_integration" "get_lista" {
 resource "aws_lambda_permission" "allow_api_gateway" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = var.function_name
+  function_name = var.function_name_list
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.api_gateway_list.execution_arn}/*/*/*"
 }
