@@ -113,13 +113,14 @@ module "lambda_list_item" {
 
 // Segundo módulo API Gateway para List Item
 module "apigateway_list" {
-  source                    = "./modules/apigateway"
-  function_name             = "listar_item"
-  http_method               = "GET"
-  user_pool_name            = var.cognito_user_pool_name
-  aws_cognito_user_pool_arn = module.cognito.user_pool_arn
-  aws_cognito_user_pool_id  = module.cognito.user_pool_id
-  value_path                = "lista-tarefa"
-  lambda_invoke_arn         = module.lambda_list_item.lambda_invoke_arn
-  lambda_function_arn       = module.lambda_list_item.lambda_function_arn
+  source                   = "./modules/api_gateway_list"
+  api_name                 = "lista-item"
+  environment              = "dev"
+  function_name            = "listar_item"
+  http_method              = var.http_method
+  region                   = var.region
+  lambda_invoke_arn_get    = module.lambda_list_item.lambda_invoke_arn
+  lambda_function_arn      = module.lambda_list_item.lambda_function_arn
+  lambda_function_name_get = module.lambda_list_item.function_name
+  cognito_user_pool_arn    = module.cognito.user_pool_arn
 }
