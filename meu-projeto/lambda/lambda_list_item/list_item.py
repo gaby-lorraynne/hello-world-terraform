@@ -1,9 +1,9 @@
 import json
 import os
-
 import boto3
 from boto3.dynamodb.conditions import Attr, Key
 
+# Configurar o cliente DynamoDB para sa-east-1 
 dynamodb = boto3.resource("dynamodb", region_name="sa-east-1")
 TABLE_NAME = os.environ.get("TABLE_NAME", "ListaMercado")
 
@@ -34,25 +34,26 @@ def listar_tarefas(data=None, user_id=None):
             # Buscar tarefas de data específica
             pk = f"LIST#{data_formatada}"
             
-            print(f"🔍 Buscando por PK: {pk}")  # Debug log
-            print(f"📅 Data original: {data}")  # Debug log
+            print(f"🔍 Buscando por PK: {pk}")
+            print(f"📅 Data original: {data}")
+            print(f"📅 Data formatada: {data_formatada}")
 
             # Query apenas pela PK específica da data
             response = table.query(
                 KeyConditionExpression=Key("PK").eq(pk)
             )
             
-            print(f"📦 Response do DynamoDB: {response}")  # Debug log
+            print(f"📦 Response do DynamoDB: {response}")
         else:
             # Buscar todas as tarefas
-            print("🔍 Buscando todas as tarefas (scan)")  # Debug log
+            print("🔍 Buscando todas as tarefas (scan)")
             response = table.scan(
                 FilterExpression=Attr("PK").begins_with("LIST#")
                 & Attr("SK").begins_with("ITEM#")
             )
             
         items = response.get("Items", [])
-        print(f"📦 Items encontrados no DynamoDB: {len(items)}")  # Debug log
+        print(f"📦 Items encontrados no DynamoDB: {len(items)}")
         
         # Log dos items para debug
         for item in items:
@@ -60,39 +61,49 @@ def listar_tarefas(data=None, user_id=None):
 
         # Converter para formato amigável
         tarefas = []
+        
+        # Se foi especificada uma data, precisamos filtrar os resultados
+        # para garantir que apenas itens da data correta sejam retornados
+        if data:
+            # Normalizar a data de busca para comparação
+            if '-' in data:
+                data_busca = data  # Já está no formato YYYY-MM-DD
+            else:
+                # Converter YYYYMMDD para YYYY-MM-DD
+                data_busca = f"{data[:4]}-{data[4:6]}-{data[6:8]}"
+        
         for item in items:
             # Validar se o item tem os campos necessários
             if all(field in item for field in ["itemId", "name", "date", "status"]):
+                # Normalizar o formato da data para YYYY-MM-DD
+                item_date = item.get("date", "")
+                
+                # Se a data está no formato YYYYMMDD, converter para YYYY-MM-DD
+                if len(item_date) == 8 and '-' not in item_date:
+                    normalized_date = f"{item_date[:4]}-{item_date[4:6]}-{item_date[6:8]}"
+                else:
+                    normalized_date = item_date
+                
+                # FILTRO ADICIONAL: Se foi especificada uma data, verificar se o item corresponde
+                if data:
+                    # Comparar com a data de busca normalizada
+                    if normalized_date != data_busca:
+                        print(f"⚠️ Item filtrado - data não corresponde: {normalized_date} != {data_busca}")
+                        continue  # Pular este item
+                
                 tarefa = {
                     "itemId": item.get("itemId"),
                     "name": item.get("name"),
-                    "date": item.get("date"),
+                    "date": normalized_date,  # Usar data normalizada
                     "status": item.get("status"),
                     "PK": item.get("PK"),
                     "SK": item.get("SK"),
                 }
                 tarefas.append(tarefa)
+                
+                print(f"✅ Item processado: {item.get('name')} - data original: {item_date} - data normalizada: {normalized_date}")
             else:
-                print(f"⚠️ Item ignorado por campos faltantes: {item}")  # Debug log
-
-        # Se foi uma busca por data específica, validar se os itens realmente são da data correta
-        if data:
-            # Normalizar data original para comparação (formato YYYY-MM-DD)
-            if '-' in data:
-                data_original = data
-            else:
-                # Converter YYYYMMDD para YYYY-MM-DD
-                data_original = f"{data[:4]}-{data[4:6]}-{data[6:8]}"
-            
-            print(f"🎯 Filtrando por data: {data_original}")  # Debug log
-            tarefas_filtradas = []
-            for tarefa in tarefas:
-                print(f"🔸 Comparando: tarefa.date='{tarefa['date']}' vs data_original='{data_original}'")
-                if tarefa["date"] == data_original:
-                    tarefas_filtradas.append(tarefa)
-            
-            tarefas = tarefas_filtradas
-            print(f"🎯 Tarefas após filtro de data '{data_original}': {len(tarefas)}")  # Debug log
+                print(f"⚠️ Item ignorado por campos faltantes: {item}")
           
         return {
             "message": "Tarefas listadas com sucesso!",
@@ -101,7 +112,7 @@ def listar_tarefas(data=None, user_id=None):
         }
 
     except Exception as e:
-        print(f"❌ Erro em listar_tarefas: {str(e)}")  # Debug log
+        print(f"❌ Erro em listar_tarefas: {str(e)}")
         raise Exception(f"Erro ao listar tarefas: {str(e)}")
 
 
@@ -121,32 +132,32 @@ def lambda_handler(event, context):
         data = None
         user_id = None
 
-        print(f"📥 Event completo: {json.dumps(event, indent=2)}")  # Debug log
+        print(f"📥 Event completo: {json.dumps(event, indent=2)}")
 
         # Query parameters - aceitar tanto 'data' quanto 'date'
         if event.get("queryStringParameters"):
             query_params = event["queryStringParameters"]
-            data = query_params.get("data") or query_params.get("date")  # Aceita ambos
+            data = query_params.get("data") or query_params.get("date")
             user_id = query_params.get("user_id")
-            print(f"📥 Query parameters: {query_params}")  # Debug log
+            print(f"📥 Query parameters: {query_params}")
 
         # Body parameters (POST)
         if event.get("body"):
             body = json.loads(event["body"])
-            data = body.get("data", data) or body.get("date", data)  # Aceita ambos
+            data = body.get("data", data) or body.get("date", data)
             user_id = body.get("user_id", user_id)
-            print(f"📥 Body parameters: {body}")  # Debug log
+            print(f"📥 Body parameters: {body}")
 
         # User ID do Cognito
         if event.get("requestContext", {}).get("authorizer", {}).get("claims"):
             user_id = event["requestContext"]["authorizer"]["claims"].get("sub")
 
-        print(f"📥 Parâmetros finais - data: {data}, user_id: {user_id}")  # Debug log
+        print(f"📥 Parâmetros finais - data: {data}, user_id: {user_id}")
       
         # Executar função principal
         resultado = listar_tarefas(data, user_id)
 
-        print(f"✅ Resultado: {resultado['count']} tarefas encontradas")  # Debug log
+        print(f"✅ Resultado: {resultado['count']} tarefas encontradas")
 
         # Resposta de sucesso
         return {
@@ -161,7 +172,7 @@ def lambda_handler(event, context):
         }
 
     except Exception as e:
-        print(f"❌ Erro no lambda_handler: {str(e)}")  # Debug log
+        print(f"❌ Erro no lambda_handler: {str(e)}")
 
         # Resposta de erro
         return {

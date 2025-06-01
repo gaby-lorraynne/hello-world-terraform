@@ -13,9 +13,9 @@ resource "aws_lambda_function" "adicionar_item" {
 
   filename         = data.archive_file.zip_add_item.output_path
   source_code_hash = data.archive_file.zip_add_item.output_base64sha256
-
-
-  role = aws_iam_role.lambda_exec.arn
+  
+  # MUDANÇA: Referência para a role específica desta lambda
+  role = aws_iam_role.lambda_exec_add.arn
 
   environment {
     variables = {
@@ -24,8 +24,9 @@ resource "aws_lambda_function" "adicionar_item" {
   }
 }
 
-resource "aws_iam_role" "lambda_exec" {
-  name = "lambda-dynamodb-role"
+# MUDANÇA: Nome único para esta role
+resource "aws_iam_role" "lambda_exec_add" {
+  name = "lambda-dynamodb-role-add-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -39,8 +40,14 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_dynamodb" {
-  role       = aws_iam_role.lambda_exec.name
+# MUDANÇA: Nome único para o attachment
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_add" {
+  role       = aws_iam_role.lambda_exec_add.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
 
+# Adicionar política básica de execução
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution_add" {
+  role       = aws_iam_role.lambda_exec_add.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}

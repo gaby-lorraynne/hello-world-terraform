@@ -1,61 +1,68 @@
-//Definindo regiao
+# Definindo região - MUDANDO PARA VIRGINIA
 variable "region" {
-  type = string
-  //Regiao de SP
-  default = "sa-east-1"
+  type        = string
+  description = "Região AWS"
+  default     = "sa-east-1" 
 }
 
-//Definindo nome function lambda
+# Ambiente
+variable "environment" {
+  description = "Ambiente de execução"
+  type        = string
+  default     = "dev"
+}
+
+# Definindo nome function lambda
 variable "function_name" {
   type        = string
-  description = "Funcao lambda"
+  description = "Nome da função Lambda"
   default     = "hello_terraform"
 }
 
-//Chamar a funcao
+# Chamar a função
 variable "handler" {
   type        = string
-  description = "Handler da funcao"
+  description = "Handler da função"
   default     = "hello_terraform.lambda_handler"
 }
 
-//Tempo de execucao da minha funcao
+# Tempo de execução da minha função
 variable "runtime" {
   type        = string
-  description = "Tempo execucao da funcao Lambda"
+  description = "Runtime da função Lambda"
   default     = "python3.12"
 }
 
-//Tamanho da memoria
+# Tamanho da memória
 variable "memory_size" {
   type        = number
-  description = "Quantidade de armazenamento"
+  description = "Quantidade de memória em MB"
   default     = 512
 }
 
-//Limite de tempo
+# Limite de tempo
 variable "timeout" {
   type        = number
-  description = "Tempo de esgotamento"
+  description = "Tempo de timeout em segundos"
   default     = 10
 }
 
 variable "lambda_role_arn" {
   type        = string
-  description = "IAM Role ARN to attach to the Lambda"
+  description = "IAM Role ARN para anexar à Lambda"
   default     = ""
 }
 
-//Criar funcao para a lambda
+# Criar função para a lambda
 variable "create_role" {
   type        = bool
-  description = "Criar uma nova funcao"
+  description = "Criar uma nova role IAM"
   default     = true
 }
 
-//Nome da tabela
+# Nome da tabela
 variable "TABLE_NAME" {
-  description = "Nome da tabela"
+  description = "Nome da tabela DynamoDB"
   type        = string
   default     = "ListaMercado"
 }
@@ -72,9 +79,7 @@ variable "value_path" {
   default     = "hello"
 }
 
-
-// variaveis do Cognito
-
+# Variáveis do Cognito
 variable "cognito_user_pool_name" {
   description = "Nome do User Pool do Cognito"
   type        = string
@@ -87,7 +92,7 @@ variable "cognito_client_name" {
   default     = "auth-client"
 }
 
-// Configurações de senha
+# Configurações de senha
 variable "cognito_password_minimum_length" {
   description = "Comprimento mínimo da senha"
   type        = number
@@ -118,14 +123,14 @@ variable "cognito_password_require_uppercase" {
   default     = true
 }
 
-// Configuração MFA
+# Configuração MFA
 variable "cognito_mfa_configuration" {
-  description = "Configuração MFA: OFF, OPTIONAL ou REQUIRED"
+  description = "Configuração MFA: OFF, OPTIONAL ou ON"
   type        = string
   default     = "OFF"
 }
 
-// Configurações do Client
+# Configurações do Client
 variable "cognito_generate_client_secret" {
   description = "Gerar segredo para o client"
   type        = bool
@@ -148,16 +153,4 @@ variable "cognito_id_token_validity" {
   description = "Validade do ID token em minutos"
   type        = number
   default     = 60
-}
-
-variable "environment" {
-  description = "Ambiente de execução"
-  type        = string
-  default     = "dev"
-}
-
-variable "function_name_list" {
-  type        = string
-  description = "Funcao lambda"
-  default     = "listar_item_v1"
 }
