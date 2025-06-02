@@ -33,3 +33,26 @@ output "cognito_user_pool_endpoint" {
   description = "Endpoint do User Pool do Cognito"
   value       = module.cognito.user_pool_endpoint
 }
+
+// Outputs da Lambda List Item
+output "list_item_function_name" {
+  description = "Nome da função Lambda de listar itens"
+  value       = module.lambda_list_item.lambda_function_name
+}
+
+output "list_item_function_arn" {
+  description = "ARN da função Lambda de listar itens"
+  value       = module.lambda_list_item.lambda_function_arn
+}
+
+output "list_item_invoke_arn" {
+  description = "Invoke ARN da Lambda de listar itens"
+  value       = module.lambda_list_item.lambda_invoke_arn
+}
+
+
+// URL completa do endpoint de listagem
+output "lista_tarefa_endpoint" {
+  description = "URL do endpoint para listar tarefas"
+  value       = "${module.apigateway_list.api_invoke_url}/lista-tarefa"
+}

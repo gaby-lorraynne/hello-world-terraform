@@ -14,5 +14,40 @@ resource "aws_lambda_function" "atualizar_item" {
   filename         = data.archive_file.zip_update_item.output_path
   source_code_hash = data.archive_file.zip_update_item.output_base64sha256
 
-  role = aws_iam_role.lambda_exec.arn
+  # MUDANÇA: Referência para a role específica desta lambda
+  role = aws_iam_role.lambda_exec_update.arn
+
+  environment {
+    variables = {
+      TABLE_NAME = var.TABLE_NAME
+    }
+  }
+}
+
+# MUDANÇA: Nome único para esta role
+resource "aws_iam_role" "lambda_exec_update" {
+  name = "lambda-dynamodb-role-update-${var.environment}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+}
+
+# MUDANÇA: Nome único para o attachment
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_update" {
+  role       = aws_iam_role.lambda_exec_update.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+}
+
+# Adicionar política básica de execução
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution_update" {
+  role       = aws_iam_role.lambda_exec_update.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }

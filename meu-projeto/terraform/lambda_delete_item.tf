@@ -4,7 +4,6 @@ data "archive_file" "zip_delete_item" {
   output_path = "${path.module}/zip/lambda_delete_item.zip"
 }
 
-
 resource "aws_lambda_function" "remover_item" {
   function_name = "remover_item"
   runtime       = "python3.12"
@@ -15,7 +14,8 @@ resource "aws_lambda_function" "remover_item" {
   filename         = data.archive_file.zip_delete_item.output_path
   source_code_hash = data.archive_file.zip_delete_item.output_base64sha256
 
-  role = aws_iam_role.lambda_exec.arn
+  # MUDANÇA: Referência para a role específica desta lambda
+  role = aws_iam_role.lambda_exec_delete.arn
 
   environment {
     variables = {
@@ -24,9 +24,25 @@ resource "aws_lambda_function" "remover_item" {
   }
 }
 
+# MUDANÇA: Nome único para esta role
+resource "aws_iam_role" "lambda_exec_delete" {
+  name = "lambda-dynamodb-role-delete-${var.environment}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+}
+
 # Policy para acesso ao DynamoDB
 resource "aws_iam_policy" "lambda_dynamodb_delete" {
-  name        = "LambdaDynamoDBDelete"
+  name        = "LambdaDynamoDBDelete-${var.environment}"
   description = "Permite deletar e buscar itens da tabela DynamoDB"
 
   policy = jsonencode({
@@ -38,14 +54,24 @@ resource "aws_iam_policy" "lambda_dynamodb_delete" {
           "dynamodb:DeleteItem",
           "dynamodb:GetItem"
         ],
-        Resource = "arn:aws:dynamodb:sa-east-1:121316933785:table/ListaMercado"
+        # MUDANÇA: Usar região correta
+        Resource = "arn:aws:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.TABLE_NAME}"
       }
     ]
   })
 }
 
-# Anexar a policy à role usada pela Lambda
-resource "aws_iam_role_policy_attachment" "lambda_dynamodb_attach" {
-  role       = aws_iam_role.lambda_exec.name
+# Data source para obter account ID
+data "aws_caller_identity" "current" {}
+
+# MUDANÇA: Nome único para o attachment
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_delete_attach" {
+  role       = aws_iam_role.lambda_exec_delete.name
   policy_arn = aws_iam_policy.lambda_dynamodb_delete.arn
+}
+
+# Adicionar política básica de execução
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution_delete" {
+  role       = aws_iam_role.lambda_exec_delete.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
